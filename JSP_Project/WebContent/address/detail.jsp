@@ -1,3 +1,4 @@
+<%@page import="java.util.ArrayList"%>
 <%@page import="com.address.Address"%>
 <%@page import="com.address.AddressDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -42,7 +43,8 @@ $(document).ready(function(){
 
 </head>
 <body>
-<form action="updatePro.jsp" method="post">
+
+<form action="updatePro.jsp" method="post" name="frm">
 <input type="hidden" name="num" value=<%=num %>>
 주소록 수정하기<br>
 이름 <input type ="text" name ="name" value=<%=address.getName() %>><br>

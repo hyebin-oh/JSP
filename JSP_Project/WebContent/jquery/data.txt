@@ -1,0 +1,12 @@
+[
+ {
+  "memberNumber" : "m001",
+  "irum" : "goroman",
+  "picture" : "cover.jpg"
+ },
+ {
+  "memberNumber" : "m002",
+  "irum" : "kingkang",
+  "picture" : "pf.jpg"
+ }
+]

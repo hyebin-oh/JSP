@@ -24,7 +24,7 @@
     
  <Resource auth="Container" 
   driverClassName="oracle.jdbc.driver.OracleDriver" 
-  loginTimeout="10" maxWait="5000" 
+  maxIdle="20" maxActive="20"
   name="jdbc/jsp" 
   password="1234"
   type="javax.sql.DataSource" 
