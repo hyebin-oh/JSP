@@ -1,5 +1,5 @@
-<%@page import="com.address.Address"%>
-<%@page import="com.address.AddressDAO"%>
+<%@page import="com.jqueryAddress.JAddressDAO"%>
+<%@page import="com.jqueryAddress.Address"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -11,7 +11,7 @@
 <%
 	request.setCharacterEncoding("utf-8");
 	int num= Integer.parseInt(request.getParameter("num"));
-	AddressDAO dao = AddressDAO.getInstance();
+	JAddressDAO dao =JAddressDAO.getInstance();
 	Address address = dao.addrDetail(num);
 %>
 <script>
@@ -21,6 +21,10 @@ $(document).ready(function(){
 			$(location).attr("href","deletePro.jsp?num=<%=num%>");
 		}
 	});//deleteBtn
+	
+	$("#zipBtn").click(function(){
+		window.open("zipCheck.jsp","","width=800 height=500");
+	})
 });//document
 
 </script>
@@ -34,7 +38,7 @@ $(document).ready(function(){
 			  <input type="button" value="검색" id="zipBtn"><br>
   	주소 <input type="text" name="addr" size=50 id="addr" value=<%=address.getAddr() %>><br>
   	전화번호 <input type="text" name="tel" id="tel" value=<%=address.getTel() %>><br>
-	<input type="button" value="수정" id="updateBtn">
+	<input type="submit" value="수정" id="updateBtn">
 	<input type="button" value="삭제" id="deleteBtn">
 	<input type="reset" value ="취소">
 </form>	

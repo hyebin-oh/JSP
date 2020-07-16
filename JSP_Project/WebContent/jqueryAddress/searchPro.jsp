@@ -1,25 +1,25 @@
+<%@page import="com.jqueryAddress.Address"%>
 <%@page import="org.json.simple.JSONObject"%>
 <%@page import="org.json.simple.JSONArray"%>
-<%@page import="com.jqueryAddress.ZipcodeBean"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.jqueryAddress.JAddressDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%
 	request.setCharacterEncoding("utf-8");
-	String dong = request.getParameter("dong");
-	//String dong = "서면";
+	String field = request.getParameter("field");
+	String word = request.getParameter("word");
 	JAddressDAO dao = JAddressDAO.getInstance();
-	ArrayList<ZipcodeBean> arr = dao.zipcodeRead(dong);
+	ArrayList<Address> arr = dao.addrList(field,word);
 	JSONArray jarr = new JSONArray();
-	for(ZipcodeBean z : arr){
+	for(Address ad : arr){
 		JSONObject obj = new JSONObject();
-			obj.put("zipcode", z.getZipcode());
-			obj.put("sido", z.getSido());
-			obj.put("gugun", z.getGugun());
-			obj.put("dong", z.getDong());
-			obj.put("bunji", z.getBunji());
-			jarr.add(obj);
-	}
+		obj.put("num", ad.getNum());
+		obj.put("name", ad.getName());
+		obj.put("tel", ad.getTel());
+		obj.put("zipcode", ad.getZipcode());
+		obj.put("addr", ad.getAddr());
+		jarr.add(obj);
+}
 	out.println(jarr.toString());
 %>
