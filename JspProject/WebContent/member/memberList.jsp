@@ -8,16 +8,20 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+<script src="member.js"></script>
 <%
 	memberDAOImpl dao=memberDAOImpl.getInstace();
 	ArrayList<MemberVO> arr = dao.memberList();
+	String suserid =(String)session.getAttribute("userid");
 	
 %>
 </head>
 <body>
-<div class="divCSS">
-<a href="memberForm.jsp" >추가하기</a>
+<div align="right">
+<a href="memberView.jsp"><%=suserid %></a>관리자님 반갑습니다.
+<a href="logout.jsp">로그아웃</a>
 </div>
 <table class="table table-striped">
 	<thead>
@@ -41,7 +45,7 @@
 			<td><%=vo.getEmail() %></td>
 			<td><%=vo.getPhone() %></td>
 			<td><%=mode %></td>
-			<td>삭제</td>
+			<td><a href="javascript:del('<%=vo.getUserid()%>','<%=mode %>')">삭제</a></td>
 		</tr>
 		<% } %>
 	</tbody>

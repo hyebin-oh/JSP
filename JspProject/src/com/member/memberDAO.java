@@ -10,7 +10,7 @@ public interface memberDAO {
 	public ArrayList<MemberVO> memberList();
 	
 	//수정하기
-	public void memberUpdate(MemberVO vo);
+	public int memberUpdate(MemberVO vo);
 	
 	//상세보기
 	public MemberVO memberView(String userid);
@@ -20,4 +20,6 @@ public interface memberDAO {
 	
 	//아이디 체크(중복체크)
 	public String idCheck(String userid);
+	
+	public int loginCheck(String userid, String pwd);
 }

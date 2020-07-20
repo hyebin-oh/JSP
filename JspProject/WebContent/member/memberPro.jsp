@@ -11,5 +11,5 @@
 	String uid= request.getParameter("uid");
 	member.setUserid(uid);
 	dao.memberInsert(member);
-	response.sendRedirect("memberList.jsp");
+	response.sendRedirect("loginForm.jsp");
 %>
