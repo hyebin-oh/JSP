@@ -5,17 +5,14 @@
 <%@page import="com.member.memberDAOImpl"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%
-	//String userid = "abcd";
-	request.setCharacterEncoding("utf-8");
-	memberDAOImpl dao = memberDAOImpl.getInstace();
+<% 
+	request.setCharacterEncoding("UTF-8");
 	String userid = request.getParameter("userid");
+	memberDAOImpl dao = memberDAOImpl.getInstace();
 	dao.memberDel(userid);
 	ArrayList<MemberVO> arr = dao.memberList();
-	int count = dao.memberCount();
-	JSONObject mainObject = new JSONObject();
 	JSONArray jarr = new JSONArray();
-	for(MemberVO vo :arr){//회원데이터
+	for(MemberVO vo : arr){
 		String mode = vo.getAdmin()==0?"일반회원":"관리자";
 		JSONObject obj = new JSONObject();
 		obj.put("name", vo.getName());
@@ -25,13 +22,6 @@
 		obj.put("mode", mode);
 		jarr.add(obj);
 	}
-	
-	JSONObject countObj = new JSONObject();
-	countObj.put("count", count);
-	
-	mainObject.put("jarr",jarr);
-	mainObject.put("cntObj", countObj);
-	
-	out.println(mainObject.toString());
-
+	out.println(jarr.toString());
+			
 %>

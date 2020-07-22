@@ -207,6 +207,31 @@ public class memberDAOImpl implements memberDAO {
 	}
 	
 
+	@Override
+	public int memberCount() {
+		Connection con = null;
+		Statement st = null;
+		ResultSet rs = null;
+		int count = 0;
+		
+		try {
+			con=getConnection();
+			st=con.createStatement();
+			String sql = "select count(*) from member";
+			rs=st.executeQuery(sql);
+			
+			if(rs.next()) {
+				count=rs.getInt(1);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeStatement(con, st, rs);
+		}
+		return count;
+	}
+
 	//´Ý±â
 	private void closeConnection(Connection con, PreparedStatement ps) {
 		try {
@@ -226,4 +251,5 @@ public class memberDAOImpl implements memberDAO {
 			e.printStackTrace();
 		}
 	}
+
 }
