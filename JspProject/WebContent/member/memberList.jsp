@@ -21,9 +21,10 @@
 </head>
 <body>
 <div align="right">
-<a href="memberView.jsp"><%=suserid %></a>관리자님 반갑습니다.
-<a href="logout.jsp">로그아웃</a><br>
-전체 회원수 : <span id="cntSpan"><%=count%></span>
+	<a href="memberView.jsp"><%=suserid %></a>관리자님 반갑습니다.
+	<a href="logout.jsp">로그아웃</a><br>
+	<a href="../board/list.jsp">게시판 글보기</a>
+	전체 회원수 : <span id="cntSpan"><%=count%></span>
 </div>
 <table class="table table-striped">
 	<thead>

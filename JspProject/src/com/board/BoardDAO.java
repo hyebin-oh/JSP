@@ -31,21 +31,56 @@ public class BoardDAO {
 	
 	
 	//추가
-	public void boardInsert(BoardVO bo) {
+	public void boardInsert(BoardVO bo) {//새글 답글 구분
 		Connection con = null;
 		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String sql="";
+		
+		//부모글
+		int num= bo.getNum();
+		int ref= bo.getRef();
+		int re_step=bo.getRe_step();
+		int re_level=bo.getRe_level();
+		
+		int number=0;
 		
 		try {
 			con=getConnection();
-			//writer, email, content,passwd, num, subject, ip
-			String sql="insert into board(num, writer, subject, email, content, passwd, ip) values (board_seq.nextval,?,?,?,?,?,?)";
+			ps=con.prepareStatement("select max(num) from board");
+			rs=ps.executeQuery();
+			if(rs.next()) {//기존 데이터가 있을 때 ref를 최대값+1로 결정
+				number=rs.getInt(1)+1;
+			}else {//기존 데이터가 없을 때 ref를 1로 결정
+				number=1;
+			}
+			if(num!=0) {//답글
+				sql="update board set re_step=re_step+1 where ref=? and re_step>?";
+				ps=con.prepareStatement(sql);
+				ps.setInt(1, ref);
+				ps.setInt(2, re_step);
+				ps.executeUpdate();
+				re_step=re_step+1;
+				re_level=re_level+1;				
+				
+			}else {//새글
+				ref=number;
+				re_step=0;
+				re_level=0;
+			}			
+			
+			//num, writer, subject, email, content,ip, readcount, ref, re_step,re_level, passwd,reg_date
+			sql="insert into board(num, writer, subject, email, content, ip, readcount, ref, re_step,re_level, passwd) values (board_seq.nextval,?,?,?,?,?,0,?,?,?,?)";
 			ps=con.prepareStatement(sql);
 			ps.setString(1, bo.getWriter());
 			ps.setString(2, bo.getSubject());
 			ps.setString(3, bo.getEmail());
 			ps.setString(4, bo.getContent());
-			ps.setString(5, bo.getPasswd());
-			ps.setString(6,  bo.getIp());
+			ps.setString(5, bo.getIp());
+			ps.setInt(6, ref);
+			ps.setInt(7, re_step);
+			ps.setInt(8, re_level);	
+			ps.setString(9, bo.getPasswd());
 			ps.executeUpdate();
 			
 		} catch (Exception e) {
@@ -58,17 +93,22 @@ public class BoardDAO {
 	
 	
 	//전체보기-검색아님
-	public ArrayList<BoardVO> boardList(){
+	public ArrayList<BoardVO> boardList(int startRow, int endRow){
 		Connection con = null;
-		Statement st = null;
 		ResultSet rs = null;
+		PreparedStatement ps = null;
 		ArrayList<BoardVO> arr = new ArrayList<BoardVO>();
 		
 		try {
 			con=getConnection();
-			String sql = "select * from board";
-			st=con.createStatement();
-			rs=st.executeQuery(sql);
+			String sql = "select * from ("
+							+ "select rownum rn, aa.* from ("
+								+ "select * from board order by ref desc, re_step asc) aa"
+								+ ") where rn <=? and rn >=?";
+			ps=con.prepareStatement(sql);
+			ps.setInt(1, endRow );
+			ps.setInt(2, startRow);
+			rs=ps.executeQuery();
 			
 			while(rs.next()) {
 				BoardVO vo = new BoardVO();
@@ -80,28 +120,32 @@ public class BoardDAO {
 				vo.setIp(rs.getString("ip"));
 				arr.add(vo);
 			}			
-		} catch (Exception e) {
-			
+		} catch (Exception e) {			
 			e.printStackTrace();
 		}finally {
-			closeStatement(con, st, rs);
+			closeStatement(con, ps, rs);
 		}		
 		return arr;
 	}
 	
 	
 	//전체보기-검색
-	public ArrayList<BoardVO> boardList(String field, String word){
+	public ArrayList<BoardVO> boardList(String field, String word, int startRow, int endRow){
 		Connection con = null;
-		Statement st = null;
+		PreparedStatement ps = null;
 		ResultSet rs = null;
 		ArrayList<BoardVO> arr = new ArrayList<BoardVO>();
 		
 		try {
 			con=getConnection();
-			String sql = "select * from board where "+ field+ " like '%"+word+"%'";
-			st=con.createStatement();
-			rs=st.executeQuery(sql);
+			String sql = "select * from ("
+					+ "select rownum rn, aa.* from ("
+						+ "select * from board where "+ field+ " like '%"+word+"%' order by ref desc, re_step asc) aa"
+						+ ") where rn <=? and rn >=?";
+			ps=con.prepareStatement(sql);
+			ps.setInt(1, endRow );
+			ps.setInt(2, startRow);
+			rs=ps.executeQuery();
 			
 			while(rs.next()) {
 				BoardVO vo = new BoardVO();
@@ -113,11 +157,10 @@ public class BoardDAO {
 				vo.setIp(rs.getString("ip"));
 				arr.add(vo);
 			}			
-		} catch (Exception e) {
-			
+		} catch (Exception e) {			
 			e.printStackTrace();
 		}finally {
-			closeStatement(con, st, rs);
+			closeStatement(con, ps, rs);
 		}		
 		return arr;
 	}
@@ -132,8 +175,9 @@ public class BoardDAO {
 		
 		try {
 			con=getConnection();
-			String sql="select * from board where num="+num;
 			st=con.createStatement();
+			st.executeUpdate("update board set readcount=readcount+1 where num="+num);
+			String sql="select * from board where num="+num;
 			rs=st.executeQuery(sql);
 			
 			if(rs.next()) {
@@ -261,6 +305,61 @@ public class BoardDAO {
 			}		
 			return count;
 		}
+	
+		
+	//comment
+	
+	//commentInsert
+	public void commentInsert(CommentVO cvo) {
+		Connection con=null;
+		PreparedStatement ps=null;
+		
+		try {
+			con=getConnection();
+			String sql="insert into commentboard(cnum, userid, regdate, msg, bnum) values(comment_seq.nextval,?,sysdate,?,?)";
+			ps=con.prepareStatement(sql);
+			ps.setString(1, cvo.getUserid());
+			ps.setString(2, cvo.getMsg());
+			ps.setInt(3, cvo.getBnum());
+			ps.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			closeConnection(con, ps);
+		}
+		
+	}
+	
+	
+	public ArrayList<CommentVO> commentList(int num){
+		Connection con = null;
+		Statement st = null;
+		ResultSet rs = null;
+		ArrayList<CommentVO> arr = new ArrayList<>();
+		
+		try {
+			con=getConnection();
+			String sql="select * from commentboard where bnum= "+num+" order by cnum desc";
+			st=con.createStatement();
+			rs=st.executeQuery(sql);
+			
+			while(rs.next()) {
+				CommentVO cvo = new CommentVO();
+				cvo.setCnum(rs.getInt("cnum"));
+				cvo.setUserid(rs.getString("userid"));
+				cvo.setRegdate(rs.getString("regdate"));
+				cvo.setMsg(rs.getString("msg"));
+				cvo.setBnum(rs.getInt("bnum"));
+				arr.add(cvo);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally{
+			closeStatement(con, st, rs);
+		}
+		return arr;		
+	}
 	
 	
 	//닫기
