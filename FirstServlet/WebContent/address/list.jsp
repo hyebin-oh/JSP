@@ -8,6 +8,9 @@
 <title>Insert title here</title>
 </head>
 <body>
+<div align="right">
+	<a href="insert.do">회원등록</a> /주소록 갯수 : ${count }
+</div>
 <table>
 	<thead>
 		<td>번호</td>
@@ -19,7 +22,7 @@
 		<c:forEach items="${listArr}" var="address">
 		<tr>
 			<td>${address.num }</td>
-			<td>${address.name }</td>
+			<td><a href="detail.do?num=${address.num }">${address.name }</a></td>
 			<td>${address.addr }</td>
 			<td>${address.tel }</td>			
 		</tr>
