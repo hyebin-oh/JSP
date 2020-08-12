@@ -15,7 +15,12 @@ $(document).ready(function(){
 				url: "commentInsert",
 				data:{"msg": $("#msg").val(), "num":${board.num}},
 				success: function(d){
-					
+					if(d.trim()==1){
+						alert("로그인하세요");
+						location.href="login.jsp";
+					}else{
+						
+					}
 				},
 				error: function(e){
 					alert("error: "+e)
