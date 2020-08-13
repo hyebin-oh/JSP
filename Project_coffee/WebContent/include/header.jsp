@@ -5,7 +5,6 @@
 <html>
 <head>
  <link rel="stylesheet" href="../style/style.css">
- <link rel="stylesheet" type="text/css" href="../styles/bootstrap4/bootstrap.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -60,11 +59,11 @@
 				</div>
 				<nav class="navbar">
 					<ul class="navbar_menu">
-						<li><a href="#">Home</a></li>
+						<li><a href="../main/main.jsp">Home</a></li>
 						<li><a href="#">About Us</a></li>
-						<li><a href="#">싱글 오리진</a></li>
-						<li><a href="#">블렌드</a></li>
-						<li><a href="#">커뮤니티</a></li>
+						<li><a href="../product/singleProductList.me">싱글 오리진</a></li>
+						<li><a href="../product/blendProductList.me">블렌드</a></li>
+						<li><a href="../notice/noticeList.me">커뮤니티</a></li>
 		
 					</ul>							
 				</nav>						

@@ -4,9 +4,8 @@
 
 
 <div class="main_slider">
-<form action="noticeInsert.me" method="post">
 <label for="nsubject">제목</label>
-<input type="text" name="nsubject" id="nsubject">
+<input type="text" name="nsubject" id="nsubject" value=>
 <label for="ncontent">내용</label>
 <textarea name="ncontent" id="ncontent"></textarea>
 <input type="submit" id="btnInsert" value="등록">

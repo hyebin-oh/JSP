@@ -46,16 +46,22 @@ public class NoticeDAO {
 		
 	}
 	//공지사항 글 수
-	public int noticeCount() {
+	public int noticeCount(String field, String query) {
 		Connection con = null;
 		Statement st = null;
 		ResultSet rs = null;
-		int count=0;		
+		int count=0;	
+		String sql ="";
 		
 		try {
 			con=getConnection();
-			String sql = "select count(*) from notice";
 			st=con.createStatement();
+			
+			if(query.equals("")) {
+				sql="select count(*) from notice";
+			}else {
+				sql="select count(*) from notice where "+field+" like '%"+query+"%'";
+			}			
 			rs=st.executeQuery(sql);
 			
 			if(rs.next()) {
@@ -69,44 +75,84 @@ public class NoticeDAO {
 		}
 		return count;
 	}
+
 	
-	//공지사항 전체보기
-	public ArrayList<NoticeDTO> noticeList(int startRow, int endRow){
-		Connection con = null;
-		Statement st = null;
-		ResultSet rs = null;
-		ArrayList<NoticeDTO> arr = new ArrayList<>();
-		
-		try {
-			con=getConnection();
-			String sql="select * from notice order by nnum";
-			st=con.createStatement();
-			rs=st.executeQuery(sql);
-			while(rs.next()) {
-				NoticeDTO notice = new NoticeDTO();
-				notice.setNcontent(rs.getString("ncontent"));
-				notice.setNdate(rs.getString("ndate"));
-				notice.setNnum(rs.getLong("nnum"));
-				notice.setNsubject(rs.getString("nsubject"));
-				notice.setNview(rs.getString("nview"));
-				arr.add(notice);
+	//전체보기 
+		public ArrayList<NoticeDTO> noticeList(String field, String query, int page){
+			Connection con = null;
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			ArrayList<NoticeDTO> arr = new ArrayList<>();
+			String sql="";
+			try {
+				con=getConnection();
+				
+				if(query.equals("")) {//검색안함
+					sql="select * from (" + 
+							"select rownum num, n.* " + 
+							"from (select * from notice order by nnum desc) n)" +
+							"where num between ? and ?";
+					
+				}else {//검색
+					sql="select * from (" + 
+							"select rownum num, n.* " + 
+							"from (select * from notice where "+field+" like '%"+ query+"%'"
+							+" order by nnum) n)" + 
+							"where num between ? and ?";
+				}
+					
+				ps=con.prepareStatement(sql);
+				ps.setInt(1, 1+(page-1)*10);
+				ps.setInt(2, page*10);
+				rs=ps.executeQuery();
+				
+				while(rs.next()) {
+					NoticeDTO notice = new NoticeDTO();
+					notice.setNcontent(rs.getString("ncontent"));
+					notice.setNdate(rs.getString("ndate"));
+					notice.setNnum(rs.getLong("nnum"));
+					notice.setNsubject(rs.getString("nsubject"));
+					notice.setNview(rs.getString("nview"));
+					arr.add(notice);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}finally {
+				closeConnection(con, ps, rs);
 			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally {
-			closeConnection(con, st, rs);
+			
+			return arr;
 		}
-		
-		return arr;
-	}
-	
+
 	//공지사항 상세보기
 	public NoticeDTO noticeView(String nsubject) {
 		Connection con = null;
 		Statement st = null;
 		ResultSet rs = null;
 		NoticeDTO notice = null;
+		
+		try {
+			con=getConnection();
+			st = con.createStatement();
+			String sql = "select * from notice where nsubject='"+nsubject+"'";
+			rs=st.executeQuery(sql);
+			
+			if(rs.next()) {
+				notice = new NoticeDTO();
+				notice.setNcontent(rs.getString("ncontent"));
+				notice.setNdate(rs.getString("ndate"));
+				notice.setNnum(rs.getLong("nnum"));
+				notice.setNsubject(rs.getString("nsubject"));
+				notice.setNview(rs.getString("nview"));
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			closeConnection(con, st, rs);
+		}
 		
 		return notice;
 	}
@@ -115,23 +161,43 @@ public class NoticeDAO {
 	public void noticeUpdate(NoticeDTO notice) {
 		Connection con = null;
 		PreparedStatement ps = null;
+		
+		try {
+			con=getConnection();
+			String sql = "update notice set nsubject=?, ncontent=? where nnum=?";
+			ps=con.prepareStatement(sql);
+			ps.setString(1, notice.getNsubject());
+			ps.setString(2, notice.getNcontent());
+			ps.setLong(3, notice.getNnum());
+			ps.executeUpdate();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			closeConnection(con, ps);
+		}
 	}
 	
 	//공지사항 삭제하기
 	public void notiecDelete(String nsubject) {
 		Connection con = null;
 		Statement st = null;
-		
+
+	
 		try {
 			con=getConnection();
-
+			String sql = "delete from notice where nsubject='"+nsubject+"'";
+			st=con.createStatement();
+			st.execute(sql);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			closeConnection(con, st, null);
 		}
-		
-		
 	}
+	
 	
 	//닫기
 		private void closeConnection(Connection con, PreparedStatement ps) {
